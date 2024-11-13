@@ -13,6 +13,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
+import io.agora.rtc2.ChannelMediaOptions
+import io.agora.rtc2.Constants
 import io.agora.rtc2.IRtcEngineEventHandler
 import io.agora.rtc2.RtcEngine
 import io.agora.rtc2.RtcEngineConfig
@@ -61,7 +63,13 @@ fun VideoCallScreen(appId: String, channelName: String, token: String) {
             setupLocalVideo(VideoCanvas(SurfaceView(context).apply {
                 setZOrderMediaOverlay(true)
             }, VideoCanvas.RENDER_MODE_HIDDEN, 0))
-            joinChannel(token, channelName, null, 0)
+            val options = ChannelMediaOptions()
+            options.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER
+            options.channelProfile = Constants.CHANNEL_PROFILE_COMMUNICATION
+            joinChannel(token, channelName, 0, options)
+
+            rtcEngine.enableVideo()
+            rtcEngine.startPreview()
         }
 
         onDispose {
@@ -77,8 +85,16 @@ fun VideoCallScreen(appId: String, channelName: String, token: String) {
         AndroidView(
             factory = { ctx ->
                 SurfaceView(ctx).apply {
+
                     Log.d("ParijatTAg", "VideoCallScreen: Local video view")
-                    rtcEngine.setupLocalVideo(VideoCanvas(this, VideoCanvas.RENDER_MODE_HIDDEN, 0))
+                    rtcEngine.setupLocalVideo(VideoCanvas(this, VideoCanvas.RENDER_MODE_FIT, 0))
+                    val options = ChannelMediaOptions()
+                    options.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER
+                    options.channelProfile = Constants.CHANNEL_PROFILE_COMMUNICATION
+                    rtcEngine.joinChannel(token, channelName, 0, options)
+
+                    rtcEngine.enableVideo()
+                    rtcEngine.startPreview()
                 }
             },
             modifier = Modifier.fillMaxSize()
@@ -89,7 +105,16 @@ fun VideoCallScreen(appId: String, channelName: String, token: String) {
             AndroidView(
                 factory = { ctx ->
                     SurfaceView(ctx).apply {
-                        rtcEngine.setupRemoteVideo(VideoCanvas(this, VideoCanvas.RENDER_MODE_HIDDEN, uid))
+                        rtcEngine.enableVideo()
+                        rtcEngine.startPreview()
+                        rtcEngine.setupRemoteVideo(VideoCanvas(this, VideoCanvas.RENDER_MODE_FIT, uid))
+                        val options = ChannelMediaOptions()
+                        options.clientRoleType = Constants.CLIENT_ROLE_BROADCASTER
+                        options.channelProfile = Constants.CHANNEL_PROFILE_COMMUNICATION
+                        rtcEngine.joinChannel(token, channelName, uid, options)
+
+                        rtcEngine.enableVideo()
+                        rtcEngine.startPreview()
                     }
                 },
                 modifier = Modifier.fillMaxSize()
