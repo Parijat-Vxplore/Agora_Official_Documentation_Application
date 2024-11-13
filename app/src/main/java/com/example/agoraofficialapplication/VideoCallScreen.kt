@@ -35,6 +35,7 @@ fun VideoCallScreen(appId: String, channelName: String, token: String) {
 //            }
 //        })
 //    }
+
     val mRtcEventHandler: IRtcEngineEventHandler = object : IRtcEngineEventHandler() {
         // Monitor remote users in the channel and obtain their uid
         override fun onUserJoined(uid: Int, elapsed: Int) {
@@ -76,6 +77,7 @@ fun VideoCallScreen(appId: String, channelName: String, token: String) {
         AndroidView(
             factory = { ctx ->
                 SurfaceView(ctx).apply {
+                    Log.d("ParijatTAg", "VideoCallScreen: Local video view")
                     rtcEngine.setupLocalVideo(VideoCanvas(this, VideoCanvas.RENDER_MODE_HIDDEN, 0))
                 }
             },
